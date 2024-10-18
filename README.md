@@ -256,22 +256,90 @@ As seguintes melhorias foram implementadas no código:
 Estas melhorias resultam em um ambiente EC2 mais seguro, automatizado e bem gerenciado, seguindo as melhores práticas de segurança e eficiência operacional na AWS.
 
 
-# Projeto Terraform
+# Terraform EC2 Configuration for VExpenses Project
 
-Este repositório contém configurações do Terraform para provisionamento de recursos na nuvem.
+## Instruções de Uso 
 
-## Pré-requisitos
+### Pré-requisitos
 
-Antes de começar, você precisará de:
+Antes de começar, certifique-se de ter o seguinte instalado e configurado:
 
-- [Terraform](https://www.terraform.io/downloads.html) instalado em sua máquina.
-- Credenciais de acesso configuradas para o provedor de nuvem que você deseja usar (por exemplo, AWS, Azure, GCP).
+1. [Terraform](https://www.terraform.io/downloads.html) (versão 1.0.0 ou superior)
+2. [AWS CLI](https://aws.amazon.com/cli/) instalado e configurado com as credenciais apropriadas
+3. Uma conta AWS com as permissões necessárias para criar recursos
 
-### Instalação do Terraform
+### Passos para Inicializar e Aplicar a Configuração
 
-1. Baixe o Terraform a partir do [site oficial](https://www.terraform.io/downloads.html).
-2. Instale o Terraform conforme as instruções para seu sistema operacional.
-3. Verifique se a instalação foi bem-sucedida:
+1. **Clone o Repositório**
+   
+   Faça o clone do repositório ou baixe os arquivos de configuração do Terraform.
+
    ```bash
-   terraform version
+   git clone <url-do-repositorio>
+   cd <diretorio-do-projeto>
+   ```
+
+2. **Inicialize o Terraform**
+   
+   Este comando baixará os plugins necessários para o provider AWS.
+
+   ```bash
+   terraform init
+   ```
+
+3. **Configure as Variáveis**
+   
+   Abra o arquivo `main.tf` e revise a seção de variáveis. Modifique as seguintes variáveis conforme necessário:
+   - `projeto`: Nome do projeto (padrão: "VExpenses")
+   - `candidato`: Seu nome ou identificador
+   - `trusted_ip`: Seu endereço IP confiável para acesso SSH (formato: "X.X.X.X/32")
+
+4. **Planeje a Execução**
+   
+   Este comando mostrará um preview das mudanças que serão feitas.
+
+   ```bash
+   terraform plan
+   ```
+
+5. **Aplique a Configuração**
+   
+   Este comando criará os recursos na AWS.
+
+   ```bash
+   terraform apply
+   ```
+
+   Quando solicitado, digite `yes` para confirmar a ação.
+
+6. **Verifique os Outputs**
+   
+   Após a aplicação bem-sucedida, o Terraform exibirá:
+   - A chave privada para acesso SSH
+   - O endereço IP público da instância EC2
+
+   Salve essas informações para uso futuro.
+
+### Notas de Segurança
+
+- A chave privada para acesso SSH será exibida no terminal. Certifique-se de salvá-la em um local seguro.
+- O acesso SSH está restrito ao IP especificado na variável `trusted_ip`.
+- O login root via SSH está desabilitado para maior segurança.
+
+### Limpeza
+
+Para remover todos os recursos criados:
+
+```bash
+terraform destroy
+```
+
+Quando solicitado, digite `yes` para confirmar a ação.
+
+**Atenção**: Isso excluirá permanentemente todos os recursos criados por esta configuração Terraform.
+
+---
+
+Se você encontrar problemas ou tiver sugestões de melhorias, por favor, abra uma issue no repositório do projeto.
+
 
