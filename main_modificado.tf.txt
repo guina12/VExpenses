@@ -1,9 +1,7 @@
-# Provedor AWS
 provider "aws" {
   region = "us-east-1"
 }
 
-# Variáveis
 variable "projeto" {
   description = "Nome do projeto"
   type        = string
@@ -22,19 +20,16 @@ variable "trusted_ip" {
   default     = "YOUR_ADMIN_IP/32"  # Substitua com o IP confiável
 }
 
-# Chave Privada
 resource "tls_private_key" "ec2_key" {
   algorithm = "RSA"
   rsa_bits  = 2048
 }
 
-# Chave de Acesso
 resource "aws_key_pair" "ec2_key_pair" {
   key_name   = "${var.projeto}-${var.candidato}-key"
   public_key = tls_private_key.ec2_key.public_key_openssh
 }
 
-# Criar VPC
 resource "aws_vpc" "main_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
@@ -45,7 +40,6 @@ resource "aws_vpc" "main_vpc" {
   }
 }
 
-# Criar Sub-rede
 resource "aws_subnet" "main_subnet" {
   vpc_id            = aws_vpc.main_vpc.id
   cidr_block        = "10.0.1.0/24"
@@ -56,7 +50,6 @@ resource "aws_subnet" "main_subnet" {
   }
 }
 
-# Criar Gateway de Internet
 resource "aws_internet_gateway" "main_igw" {
   vpc_id = aws_vpc.main_vpc.id
 
@@ -65,7 +58,6 @@ resource "aws_internet_gateway" "main_igw" {
   }
 }
 
-# Criar Tabela de Rotas
 resource "aws_route_table" "main_route_table" {
   vpc_id = aws_vpc.main_vpc.id
 
@@ -79,7 +71,6 @@ resource "aws_route_table" "main_route_table" {
   }
 }
 
-# Associar Tabela de Rotas à Sub-rede
 resource "aws_route_table_association" "main_association" {
   subnet_id      = aws_subnet.main_subnet.id
   route_table_id = aws_route_table.main_route_table.id
@@ -89,14 +80,13 @@ resource "aws_route_table_association" "main_association" {
   }
 }
 
-# Criar Grupo de Segurança
 resource "aws_security_group" "main_sg" {
   name        = "${var.projeto}-${var.candidato}-sg"
   description = "Permitir SSH de um IP confiável e tráfego HTTP para Nginx"
   vpc_id      = aws_vpc.main_vpc.id
 
   ingress {
-    description = "Permitir SSH do IP confiável"
+    description = "Allow SSH from trusted IP"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -104,7 +94,7 @@ resource "aws_security_group" "main_sg" {
   }
 
   ingress {
-    description = "Permitir tráfego HTTP"
+    description = "Allow HTTP traffic"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -112,7 +102,7 @@ resource "aws_security_group" "main_sg" {
   }
 
   egress {
-    description = "Permitir todo tráfego de saída"
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -124,7 +114,6 @@ resource "aws_security_group" "main_sg" {
   }
 }
 
-# Encontrar AMI do Debian 12
 data "aws_ami" "debian12" {
   most_recent = true
 
@@ -141,7 +130,6 @@ data "aws_ami" "debian12" {
   owners = ["679593333241"]
 }
 
-# Criar Instância EC2
 resource "aws_instance" "debian_ec2" {
   ami             = data.aws_ami.debian12.id
   instance_type   = "t2.micro"
@@ -159,10 +147,7 @@ resource "aws_instance" "debian_ec2" {
               systemctl start nginx
               systemctl enable nginx
 
-              # Desativar login root
               sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
-              # Ajustar permissões
-              chmod 600 /etc/ssh/sshd_config
               systemctl restart sshd
               EOF
 
@@ -178,7 +163,6 @@ resource "aws_instance" "debian_ec2" {
   }
 }
 
-# Saídas
 output "private_key" {
   description = "Chave privada para acessar a instância EC2"
   value       = tls_private_key.ec2_key.private_key_pem
