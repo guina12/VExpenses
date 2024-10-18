@@ -254,3 +254,24 @@ As seguintes melhorias foram implementadas no código:
    - Motivo: Melhora a organização e rastreabilidade dos recursos na AWS
 
 Estas melhorias resultam em um ambiente EC2 mais seguro, automatizado e bem gerenciado, seguindo as melhores práticas de segurança e eficiência operacional na AWS.
+
+
+# Projeto Terraform
+
+Este repositório contém configurações do Terraform para provisionamento de recursos na nuvem.
+
+## Pré-requisitos
+
+Antes de começar, você precisará de:
+
+- [Terraform](https://www.terraform.io/downloads.html) instalado em sua máquina.
+- Credenciais de acesso configuradas para o provedor de nuvem que você deseja usar (por exemplo, AWS, Azure, GCP).
+
+### Instalação do Terraform
+
+1. Baixe o Terraform a partir do [site oficial](https://www.terraform.io/downloads.html).
+2. Instale o Terraform conforme as instruções para seu sistema operacional.
+3. Verifique se a instalação foi bem-sucedida:
+   ```bash
+   terraform version
+
